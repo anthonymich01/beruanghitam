@@ -1,0 +1,19 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "lib": ["es6"],
+    "types": ["node"],
+    "target": "es6",
+    "module": "commonjs",
+    "rootDir": "./",
+    "outDir": "./build",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": false,
+    "importHelpers": true
+  },
+  "include": ["**/*"],
+  "exclude": ["./build"]
+}
