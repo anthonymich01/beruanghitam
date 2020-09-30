@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt"
 import { saltRounds } from "../constant/bcrypt"
 import db from "../db"
-import { insertNewUserByEmailPassword, getUserByEmail } from "../db/query"
+import { insertNewUserByEmailPassword, getUserByEmail, getUserIdById } from "../db/query"
 
 type isUserCreated = {
   status: boolean
@@ -14,7 +14,33 @@ type isUserLoggedIn = {
   userId?: number
 }
 
+type userDetail = {
+  id: number
+  full_name: string
+  email: string
+  role: string
+} | null
+
 class User {
+  getUserDetailById = async (id: number): Promise<userDetail> => {
+    try {
+      const res = await db.query(getUserIdById, [id])
+      if (res.rows[0]) {
+        const userDetail: any = res.rows[0]
+        return {
+          id: userDetail.id,
+          full_name: userDetail.full_name,
+          email: userDetail.email,
+          role: userDetail.role
+        }
+      }
+      return null
+    } catch (error) {
+      console.log(error)
+      return null
+    }
+  }
+
   isEmailDuplicated = async (email: string): Promise<boolean> => {
     try {
       const res = await db.query(getUserByEmail, [email])
@@ -28,16 +54,16 @@ class User {
     }
   }
 
-  createUserByEmailPassword = async (email: string, password: string): Promise<isUserCreated> => {
+  createUserByEmailPassword = async (full_name: string, email: string, password: string): Promise<isUserCreated> => {
     const checkUserEmail: boolean = await this.isEmailDuplicated(email)
-    if (checkUserEmail) {
-      return { status: false, message: "Email already taken." }
-    }
+    if (checkUserEmail) return { status: false, message: "Email already taken." }
 
-    const hashedPassword = await bcrypt.hash(password, saltRounds)
+    const trimmedFullName: string = full_name.trim()
+    const trimmedEmail: string = email.trim()
+    const hashedPassword: string = await bcrypt.hash(password, saltRounds)
 
     try {
-      await db.query(insertNewUserByEmailPassword, [email, hashedPassword])
+      await db.query(insertNewUserByEmailPassword, [trimmedFullName, trimmedEmail, hashedPassword])
       return { status: true, message: "" }
     } catch (error) {
       console.log(error)
@@ -51,9 +77,7 @@ class User {
       if (res.rows[0]) {
         const userData: any = res.rows[0]
         const checkPassword: boolean = await bcrypt.compare(password, userData.password)
-        if (checkPassword) {
-          return { status: true, message: "", userId: +userData.id }
-        }
+        if (checkPassword) return { status: true, message: "", userId: +userData.id }
       }
       return { status: false, message: "Email / Password anda salah." }
     } catch (error) {
