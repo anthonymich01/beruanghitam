@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt"
 import { saltRounds } from "../constant/bcrypt"
 import db from "../db"
-import { insertNewUserByEmailPassword, getUserByEmail, getUserIdById } from "../db/query"
+import { insertNewUserByEmailPassword, getUserByEmail, getUserIdById, insertNewDefaultWatchlistByUserId } from "../db/query"
 
 type isUserCreated = {
   status: boolean
@@ -18,7 +18,7 @@ type userDetail = {
   id: number
   full_name: string
   email: string
-  role: string
+  role: number
 } | null
 
 class User {
@@ -63,7 +63,10 @@ class User {
     const hashedPassword: string = await bcrypt.hash(password, saltRounds)
 
     try {
-      await db.query(insertNewUserByEmailPassword, [trimmedFullName, trimmedEmail, hashedPassword])
+      const res = await db.query(insertNewUserByEmailPassword, [trimmedFullName, trimmedEmail, hashedPassword])
+      const newUserId = res.rows[0]["id"]
+      await db.query(insertNewDefaultWatchlistByUserId, [newUserId])
+
       return { status: true, message: "" }
     } catch (error) {
       console.log(error)

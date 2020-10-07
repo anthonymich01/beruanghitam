@@ -10,6 +10,7 @@ import user from "./src/routes/user"
 import login from "./src/routes/login"
 import register from "./src/routes/register"
 import post from "./src/routes/post"
+import watchlist from "./src/routes/watchlist"
 
 const app = express()
 const PORT = process.env.EXP_PORT || 3000
@@ -51,6 +52,12 @@ app.post("/v1/register", register)
 
 // Login
 app.post("/v1/login", login)
+
+// Watchlist
+app.get("/v1/watchlist", authToken, watchlist.get)
+
+// Watchlist
+app.get("/v1/watchlist/stock", watchlist.getStockList)
 
 // END ROUTES -------
 
