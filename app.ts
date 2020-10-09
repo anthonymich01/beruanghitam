@@ -55,8 +55,9 @@ app.post("/v1/login", login)
 
 // Watchlist
 app.get("/v1/watchlist", authToken, watchlist.get)
+app.post("/v1/watchlist", authToken, watchlist.update)
 
-// Watchlist
+// Indonesia Stock Database
 app.get("/v1/watchlist/stock", watchlist.getStockList)
 
 // END ROUTES -------

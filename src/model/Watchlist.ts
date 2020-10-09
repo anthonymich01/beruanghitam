@@ -1,5 +1,5 @@
 import db from "../db"
-import { getSymbolWatchlistByUserId, getWatchlistDataByCode } from "../db/query"
+import { getSymbolWatchlistByUserId, getWatchlistDataByCode, updateWatchlistDataByUserId } from "../db/query"
 
 class Watchlist {
   getWatchlistByUserId = async (userId: number): Promise<any> => {
@@ -22,6 +22,17 @@ class Watchlist {
     } catch (error) {
       console.log(error)
       return { list: [] }
+    }
+  }
+
+  updateWatchlistData = async (watchlist: Array<string>, userId: number): Promise<any> => {
+    try {
+      const res = await db.query(updateWatchlistDataByUserId, [watchlist, userId])
+      const symbols = res.rows[0]["symbol"]
+      return { symbols }
+    } catch (error) {
+      console.log(error)
+      return { symbols: {} }
     }
   }
 }

@@ -21,5 +21,9 @@ SELECT symbol FROM watchlist WHERE user_id = $1
 `
 
 export const getWatchlistDataByCode: string = `
-SELECT code, description FROM stocks WHERE code LIKE $1
+SELECT code, description FROM stocks WHERE code ILIKE $1 or description ILIKE $1 LIMIT 20
+`
+
+export const updateWatchlistDataByUserId: string = `
+UPDATE watchlist SET symbol = $1 WHERE user_id = $2 RETURNING symbol
 `
